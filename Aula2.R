@@ -68,7 +68,8 @@ nrow(pessoas[pessoas$sexo == 'feminino',])
 
 #Slide 10 - Página 22
 #Carregue o arquivo http://www.razer.net.br/datasets/Biomassa_REG.csv
-read.csv2("Biomassa_REG.csv")
+setwd("D:/Cursos/Pos_IA/linguagem_r")
+biomassa<-read.csv2("Biomassa_REG.csv")
 
 #Carregue o arquivo http://www.razer.net.br/datasets/fertility.csv
 fert<-read.csv("fertility.csv")
