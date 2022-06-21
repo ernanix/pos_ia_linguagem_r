@@ -136,3 +136,105 @@ for (l in 1:nrow(matriz)) {
 student.df <- data.frame( name = c("Sue", "Eva", "Henry", "Jan"),sex = c("f", "f", "m", "m"),years = c(21,31,29,19));
 
 #Usando um comando ifelse(), crie uma coluna chamada teen, booleana, que indica se a pessoa possui menos de 20 anos.
+student.df$teen <- ifelse(student.df$years < 20, TRUE, FALSE)
+
+#Crie o seguinte data frame
+a = c(3,7,NA, 9)
+b = c(2,NA,9,3)
+f = c(5,2,5,6)
+d = c(NA,3,4,NA)
+mydf = data.frame(a=a,b=b,f=f,d=d)
+
+#Adicione uma quinta coluna usando as seguintes regras:
+#1. A 5a coluna tem o valor da coluna 2 se a coluna 1 é NA
+#2. A 5a coluna tem o valor da coluna 4 se a coluna 2 é NA
+#3. A 5a coluna contém o valor da coluna 3 em qualquer outro caso
+
+mydf$e <- ifelse(is.na(mydf$a),mydf$b,ifelse(is.na(mydf$b),mydf$d,mydf$f))
+
+#Crie uma matriz com 10 colunas contendo 100.000 números, sendo os números de 
+#1:100000. Faça um laço for que calcula a soma de cada linha desta matriz.
+
+matriz2 <- matrix(1:100000,ncol = 10)
+
+for (l in 1:nrow(matriz2)) {
+  suml <- 0 
+  for (c in 1:ncol(matriz2)) {
+    suml <- suml + matriz2[l,c]
+  }
+  print(paste("linha",l,"- soma:",suml))
+}
+
+#Crie o seguinte data frame
+vector1 <- 1:10
+vector2 <- c("Odd", "Loop", letters[1:8])
+vector3 <- rnorm(10, sd = 10)
+df1 <- data.frame(vector1, vector2, vector3, stringsAsFactors = FALSE)
+
+#Faça um laço genérico sobre as colunas deste data frame efetuando o seguinte cálculo:
+#  • Se a coluna for numérica, calcula sua média
+#  • Se a coluna for de texto calcula a soma dos caracteres na coluna (nchar())
+for(c in 1:ncol(df1)) {
+  if (is.numeric(df1[,c])) {
+    print(mean(df1[,c]))
+  }else{
+    print(sum(nchar(df1[,c])))
+  }
+}
+
+#Slide 11 - Página 31
+
+#Crie um script R (chamado funcoes.R) e escreva nele as seguinte funções:
+#  • Para calcular o quadrado de um número
+#  • Para receber duas matrizes e retornar a multiplicação
+#  • Para receber um data frame contendo uma coluna nome e uma coluna idade, e retornar a média das idades
+#  • Para receber um data frame contendo uma coluna nome e uma coluna idade, e retornar 
+#    uma lista com dois dados, o nome e a idade, da pessoa que contém a maior idade
+
+quadrado <- function (numero) {
+  return (numero^2)
+}
+
+multMatrizes <- function (m1,m2) {
+  return (m1 %*% m2)
+}
+
+mediaIdade <- function(pessoas) {
+  return (mean(pessoas$idade))
+}
+
+maiorIdade <- function(pessoas){
+  return(pessoas[which(pessoas$idade == max(pessoas$idade)),])
+}
+
+
+#Slide 12 - Página 13
+
+#Crie uma matriz com 10 colunas contendo 100.000 números, sendo os números de 1:100000.
+#• Execute um comando apply que calcula a soma de cada linha desta matriz.
+#• Execute um comando apply que calcula a média de cada coluna desta matriz
+
+matriz <- matrix(1:100000,ncol=10)
+apply(matriz,1,sum)
+apply(matriz,2,mean)
+
+#Crie o seguinte data frame
+idade <- c(56, 34, 67, 33, 25, 28)
+peso <- c(78, 67, 56, 44, 56, 89)
+altura <- c(165, 171, 167, 167, 166, 181)
+dados <- data.frame(idade, peso, altura)
+
+#Dê as seguintes respostas
+#• A média de todas as colunas (usando apply)
+apply(dados,2,mean)
+#• O valor máximo de todas as colunas (usando apply)
+apply(dados,2,max)
+#• A raiz quadrada de todos os valores do data frame, como uma matriz
+sapply(dados, sqrt)
+#• A raiz quadrada de todos os valores do data frame, como uma lista
+lapply(dados, sqrt)
+#• Todos os valores do data frame multiplicados por 20, como uma matriz (usando uma UDF)
+mult20 <- function(x) {
+  return(x * 20)
+}
+sapply(dados,mult20)
