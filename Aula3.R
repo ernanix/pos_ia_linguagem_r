@@ -85,3 +85,88 @@ lines(y=predicaoG2,x=cars$speed,type="l",col="red")
 lines(y=predicaoG3,x=cars$speed,type="l",col="yellow")
 lines(y=predicaoG4,x=cars$speed,type="l",col="blue")
 lines(y=predicaoG5,x=cars$speed,type="l",col="green")
+
+#Slide 14 - Página 12
+
+#Efetuar o exercício de classificação apresentado, usando a base IRIS.
+#a) Apresente os resultados dos modelos
+#b) Apresente o modelo que deu o melhor resultado
+
+#Carrega o dataset
+dataset <- iris
+
+#Particiona o dataset
+indices <- createDataPartition(dataset$Species, p=0.80, list=FALSE)
+treino <- dataset[indices,]
+teste <- dataset[-indices,]
+
+#RandomForest
+#Treino
+rf <- train(Species~., data=treino, method="rf")
+#Predição
+predicoes.rf <- predict(rf, teste)
+#Matriz de Confusão
+confusionMatrix(predicoes.rf, teste$Species)
+
+#SVM
+#Treino
+svm <- train(Species~., data=treino, method="svmRadial")
+#Predição
+predicoes.svm <- predict(svm, teste)
+#Matriz de Confusão
+confusionMatrix(predicoes.svm, teste$Species)
+
+
+#####
+library(mlbench)
+library(caret)
+library(mice)
+
+data(BreastCancer)
+temp_dados <- BreastCancer
+temp_dados$Id <- NULL
+#mice -> Analisa os dados e gera dados plausíveis a serem colocados nos Na's
+imp <- mice(temp_dados)
+# complete -> Completa os dados com o 1° conjunto plausível de dados
+dados <- complete(imp, 1)
+
+
+indices <- createDataPartition(dados$Class, p=0.80,
+                               list=FALSE)
+treino <- dados[indices,]
+teste <- dados[-indices,]
+
+set.seed(7)
+
+#Treinar RF, SVM e RNA com a base de Treino
+rf <- train(Class~., data=treino, method="rf")
+svm <- train(Class~., data=treino, method="svmRadial")
+rna <- train(Class~., data=treino, method="nnet",trace=FALSE)
+
+#Aplicar modelos treinados na base de Teste
+predict.rf <- predict(rf, teste)
+predict.svm <- predict(svm, teste)
+predict.rna <- predict(rna, teste)
+
+#Verificar a quantidade de amostrar de cada classe na base de Teste
+table(teste$Class)
+
+#Criar as matrizes de confusão e comparar os resultados
+confusionMatrix(predict.rf, teste$Class)
+confusionMatrix(predict.svm, teste$Class)
+confusionMatrix(predict.rna, teste$Class)
+
+print(rna)
+
+library(nnet)
+final_model<-nnet(Class~.,data=dados,size=1,decay=0.1)
+final_predict.rna <- predict(final_model, dados)
+confusionMatrix(final_predict.rna, dados$Class)
+
+library(kernlab)
+final_model <- ksvm(type="C-svc", Class~., data=dados, kernel="rbfdot",
+                    C=1.0, kpar=list(sigma=0.01173596))
+final_predict.svm <- predict(final_model, dados)
+confusionMatrix(final_predict.svm, dados$Class)
+
+saveRDS(final_model, "cancer_mama_svm.rds")

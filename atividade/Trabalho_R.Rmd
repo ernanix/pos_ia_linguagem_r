@@ -1,39 +1,84 @@
----
-title: "Trabalho Linguagem R"
-author: "Ernani de Souza Cubas Neto"
-date: '19/06/2022'
-output: html_document
----
+
+<style>
+  body {
+    text-align: justify
+  }
+</style>
+
+![](D:/Cursos/Pos_IA/linguagem_r/atividade/top.jpg)
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
+
+#### **TRABALHO DA DISCIPLINA - LINGUAGEM R**
 
 ***
 
-### **Pesquisa com Dados de Satélite (Satellite)**
+#### **Pesquisa com Dados de Satélite (Satellite)**
 
-#### O banco de dados consiste nos valores multi-espectrais de pixels em vizinhanças 3x3 em uma imagem de satélite, e na classificação associada ao pixel central em cada vizinhança. O objetivo é prever esta classificação, dados os valores multi-espectrais.
+##### O banco de dados consiste nos valores multi-espectrais de pixels em vizinhanças 3x3 em uma imagem de satélite, e na classificação associada ao pixel central em cada vizinhança. O objetivo é prever esta classificação, dados os valores multi-espectrais.
 
-#### Um quadro de imagens do Satélite Landsat com MSS (Multispectral Scanner System) consiste em quatro imagens digitais da mesma cena em diferentes bandas espectrais. Duas delas estão na região visível (correspondendo aproximadamente às regiões verde e vermelha do espectro visível) e duas no infravermelho (próximo). Cada pixel é uma palavra binária de 8 bits, com 0 correspondendo a preto e 255 a branco. A resolução espacial de um pixel é de cerca de 80m x 80m. Cada imagem contém 2340 x 3380 desses pixels. O banco de dados é uma subárea (minúscula) de uma cena, consistindo de 82 x 100 pixels. Cada linha de dados corresponde a uma vizinhança quadrada de pixels 3x3 completamente contida dentro da subárea 82x100. Cada linha contém os valores de pixel nas quatro bandas espectrais (convertidas em ASCII) de cada um dos 9 pixels na vizinhança de 3x3 e um número indicando o rótulo de classificação do pixel central.
+##### Um quadro de imagens do Satélite Landsat com MSS (Multispectral Scanner System) consiste em quatro imagens digitais da mesma cena em diferentes bandas espectrais. Duas delas estão na região visível (correspondendo aproximadamente às regiões verde e vermelha do espectro visível) e duas no infravermelho (próximo). Cada pixel é uma palavra binária de 8 bits, com 0 correspondendo a preto e 255 a branco. A resolução espacial de um pixel é de cerca de 80m x 80m. Cada imagem contém 2340 x 3380 desses pixels. O banco de dados é uma subárea (minúscula) de uma cena, consistindo de 82 x 100 pixels. Cada linha de dados corresponde a uma vizinhança quadrada de pixels 3x3 completamente contida dentro da subárea 82x100. Cada linha contém os valores de pixel nas quatro bandas espectrais (convertidas em ASCII) de cada um dos 9 pixels na vizinhança de 3x3 e um número indicando o rótulo de classificação do pixel central.
 
-#### As classes são: solo vermelho, colheita de algodão, solo cinza, solo cinza úmido, restolho de vegetação, solo cinza muito úmido.
+##### As classes são: solo vermelho, colheita de algodão, solo cinza, solo cinza úmido, restolho de vegetação, solo cinza muito úmido.
 
-#### Os dados estão em ordem aleatória e certas linhas de dados foram removidas, portanto você não pode reconstruir a imagem original desse conjunto de dados. Em cada linha de dados, os quatro valores espectrais para o pixel superior esquerdo são dados primeiro, seguidos pelos quatro valores espectrais para o pixel superior central e, em seguida, para o pixel superior direito, e assim por diante, com os pixels lidos em sequência, da esquerda para a direita e de cima para baixo. Assim, os quatro valores espectrais para o pixel central são dados pelos atributos 17, 18, 19 e 20. Se você quiser, pode usar apenas esses quatro atributos, ignorando os outros. Isso evita o problema que surge quando uma vizinhança 3x3 atravessa um limite.
+##### Os dados estão em ordem aleatória e certas linhas de dados foram removidas, portanto você não pode reconstruir a imagem original desse conjunto de dados. Em cada linha de dados, os quatro valores espectrais para o pixel superior esquerdo são dados primeiro, seguidos pelos quatro valores espectrais para o pixel superior central e, em seguida, para o pixel superior direito, e assim por diante, com os pixels lidos em sequência, da esquerda para a direita e de cima para baixo. Assim, os quatro valores espectrais para o pixel central são dados pelos atributos 17, 18, 19 e 20. Se você quiser, pode usar apenas esses quatro atributos, ignorando os outros. Isso evita o problema que surge quando uma vizinhança 3x3 atravessa um limite.
 
-#### O banco de dados se encontra no pacote **mlbench** e é completo (não possui dados faltantes).
+##### O banco de dados se encontra no pacote **mlbench** e é completo (não possui dados faltantes)
 
-***
-##### **Carregando a base de dados _Satellite_**
-```{r echo=TRUE}
-data("Satellite")
+> #### **Carregando a base:**
+> ```{r,echo=TRUE}
+  library("mlbench")
+  data(Satellite)
+  dados_satelite <- Satellite
+  ```
+> #### **Particionando a base:**
+> ```{r,echo=TRUE}
+  library(caret)
+  set.seed(2114)
+  indices <- createDataPartition(dados_satelite$classes, p=0.80, list=FALSE)
+  treino <- dados_satelite[indices,]
+  teste <- dados_satelite[-indices,]
+  ```
 
+> #### **Tarefas:**
+> #### 1. Treine modelos RandomForest, SVM e RNA para predição destes dados.
+> ```{r,echo=TRUE}
+  rf <- train(classes~x.17+x.18+x.19+x.20, data=treino, method="rf")
+  svm <- train(classes~x.17+x.18+x.19+x.20, data=treino, method="svmRadial")
+  rna <- train(classes~x.17+x.18+x.19+x.20, data=treino, method="nnet",trace=FALSE)
+  
+  ```
+> #### 2. Escolha o melhor modelo com base em suas matrizes de confusão.
+> #### 2.1. Aplicar modelos treinados na base de Teste
+> ```{r,echo=TRUE}
+  predict.rf <- predict(rf, teste)
+  predict.svm <- predict(svm, teste)
+  predict.rna <- predict(rna, teste)
 ```
-***
-##### **1) Treine modelos RandomForest, SVM e RNA para predição destes dados**
-
-##### RandomForest
-```{r echo=TRUE}
-
+> #### 2.2. Criar as matrizes de confusão e comparar os resultados
+> ```{r,echo=TRUE}
+  confusionMatrix(predict.rf, teste$classes)
+  confusionMatrix(predict.svm, teste$classes)
+  confusionMatrix(predict.rna, teste$classes)
 ```
-
+> ##### **Conclusão:** O modelo SVM apresentou uma maior acurácia, de 0.8629. Será então o modelo escolhido
+> #### 3. Treine o modelo final com todos os dados e faça a predição na base completa.
+> #### 3.1. Verificando o valor de sigma e C
+> ```{r,echo=TRUE}
+  print(svm)
+  ```
+> #### 3.2. Treinando o modelo final com os dados encontrados
+> ```{r,echo=TRUE}
+  library(kernlab)
+  final_model <- ksvm(type="C-svc", classes~x.17+x.18+x.19+x.20, data=dados_satelite, kernel="rbfdot",
+                      C=1.0, kpar=list(sigma=1.033562))
+  final_predict.svm <- predict(final_model, dados_satelite)
+  confusionMatrix(final_predict.svm, dados_satelite$classes)
+```
+> #### 4. Analise o resultado.
+> #### 5. Salve este modelo final
+> ```{r,echo=TRUE}
+  saveRDS(final_model, "satellite_svm.rds")
+```
