@@ -170,3 +170,46 @@ final_predict.svm <- predict(final_model, dados)
 confusionMatrix(final_predict.svm, dados$Class)
 
 saveRDS(final_model, "cancer_mama_svm.rds")
+
+
+###################Regressão
+
+df_rs <-read.csv("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/real_state_tw.csv",sep=";",dec=",")
+
+set.seed(7)
+
+indices <- createDataPartition(df_rs$Y.house.price.of.unit.area, p=0.80, list=FALSE)
+treino <- df_rs[indices,]
+teste <- df_rs[-indices,]
+
+# treino e predição - RandomForest
+rf <- train(Y.house.price.of.unit.area~.,data=treino,method="rf")
+predicoes.rf <- predict(rf,teste)
+
+# treino e predição - SVM
+svm <- train(Y.house.price.of.unit.area~.,data=treino,method="svmRadial")
+predicoes.svm <- predict(svm,teste)
+
+# treino e predição - RNA (Redes Neurais)
+rna <- train(Y.house.price.of.unit.area~.,data=treino,method="nnet",trace=FALSE)
+predicoes.rna <- predict(rna,teste)
+
+# treino e predição - MLP (Perceptron MultiLayers)
+install.packages("RSNNS")
+library(RSNNS)
+mlp <- mlp(treino[,1:7], treino[,8], linOut=T)
+predicoes.mlp <- predict(mlp,teste[,1:7])
+
+#Obtém metricas de cada modelo
+rmse.rf <- RMSE(predicoes.rf, teste$Y.house.price.of.unit.area)
+rmse.svm <- RMSE(predicoes.svm, teste$Y.house.price.of.unit.area)
+rmse.rna <- RMSE(predicoes.rna, teste$Y.house.price.of.unit.area)
+rmse.mlp <- RMSE(predicoes.mlp, teste$Y.house.price.of.unit.area)
+
+rmse.rf
+rmse.svm
+rmse.rna
+rmse.mlp
+
+#RMSE - Root Mean Squared Error - Quanto menor, menos erro cometido
+#Melhor - rmse.rf

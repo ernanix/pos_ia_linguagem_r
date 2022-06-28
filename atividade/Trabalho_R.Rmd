@@ -11,6 +11,11 @@
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+```{r,echo=FALSE}
+  setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
+```
+
+
 #### **TRABALHO DA DISCIPLINA - LINGUAGEM R**
 
 ***
@@ -28,37 +33,42 @@ knitr::opts_chunk$set(echo = FALSE)
 ##### O banco de dados se encontra no pacote **mlbench** e é completo (não possui dados faltantes)
 
 > #### **Carregando a base:**
-> ```{r,echo=TRUE}
+
+```{r,echo=TRUE}
   library("mlbench")
   data(Satellite)
   dados_satelite <- Satellite
-  ```
+```
 > #### **Particionando a base:**
-> ```{r,echo=TRUE}
+
+```{r,echo=TRUE}
   library(caret)
   set.seed(2114)
   indices <- createDataPartition(dados_satelite$classes, p=0.80, list=FALSE)
   treino <- dados_satelite[indices,]
   teste <- dados_satelite[-indices,]
-  ```
+```
 
 > #### **Tarefas:**
 > #### 1. Treine modelos RandomForest, SVM e RNA para predição destes dados.
-> ```{r,echo=TRUE}
-  rf <- train(classes~x.17+x.18+x.19+x.20, data=treino, method="rf")
-  svm <- train(classes~x.17+x.18+x.19+x.20, data=treino, method="svmRadial")
-  rna <- train(classes~x.17+x.18+x.19+x.20, data=treino, method="nnet",trace=FALSE)
+
+```{r,echo=TRUE}
+  rf <- caret::train(classes~x.17+x.18+x.19+x.20, data=treino, method="rf")
+  svm <- caret::train(classes~x.17+x.18+x.19+x.20, data=treino, method="svmRadial")
+  rna <- caret::train(classes~x.17+x.18+x.19+x.20, data=treino, method="nnet",trace=FALSE)
   
-  ```
+```
 > #### 2. Escolha o melhor modelo com base em suas matrizes de confusão.
 > #### 2.1. Aplicar modelos treinados na base de Teste
-> ```{r,echo=TRUE}
+
+```{r,echo=TRUE}
   predict.rf <- predict(rf, teste)
   predict.svm <- predict(svm, teste)
   predict.rna <- predict(rna, teste)
 ```
 > #### 2.2. Criar as matrizes de confusão e comparar os resultados
-> ```{r,echo=TRUE}
+
+```{r,echo=TRUE}
   confusionMatrix(predict.rf, teste$classes)
   confusionMatrix(predict.svm, teste$classes)
   confusionMatrix(predict.rna, teste$classes)
@@ -66,11 +76,13 @@ knitr::opts_chunk$set(echo = FALSE)
 > ##### **Conclusão:** O modelo SVM apresentou uma maior acurácia, de 0.8629. Será então o modelo escolhido
 > #### 3. Treine o modelo final com todos os dados e faça a predição na base completa.
 > #### 3.1. Verificando o valor de sigma e C
-> ```{r,echo=TRUE}
+
+```{r,echo=TRUE}
   print(svm)
-  ```
+```
 > #### 3.2. Treinando o modelo final com os dados encontrados
-> ```{r,echo=TRUE}
+
+```{r,echo=TRUE}
   library(kernlab)
   final_model <- ksvm(type="C-svc", classes~x.17+x.18+x.19+x.20, data=dados_satelite, kernel="rbfdot",
                       C=1.0, kpar=list(sigma=1.033562))
@@ -79,6 +91,46 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 > #### 4. Analise o resultado.
 > #### 5. Salve este modelo final
-> ```{r,echo=TRUE}
+
+```{r,echo=TRUE}
   saveRDS(final_model, "satellite_svm.rds")
 ```
+
+***
+
+#### **Estimativa de Volumes de Árvores**
+
+##### Modelos de aprendizado de máquina são bastante usados na área da engenharia florestal (mensuração florestal) para, por exemplo, estimar o volume de madeira de árvores sem ser necessário abatê-las.
+
+##### O processo é feito pela coleta de dados (dados observados) através do abate de algumas árvores, onde sua altura, diâmetro na altura do peito (dap), etc, são medidos de forma exata. Com estes dados, treina-se um modelo de AM que pode estimar o volume de outras árvores da população.
+
+##### As classes são: solo vermelho, colheita de algodão, solo cinza, solo cinza úmido, restolho de vegetação, solo cinza muito úmido.
+
+##### Os modelos, chamados **alométricos**, são usados na área há muitos anos e são baseados em regressão (linear ou não) para encontrar uma equação que descreve os dados. Por exemplo, o modelo de Spurr é dado por:
+
+> ##### Volume = b0 + b1 * dap² * Ht
+
+##### Onde **dap** é o diâmetro na altura do peito (1,3metros), **Ht** é a altura total. Tem-se vários modelos alométricos, cada um com uma determinada característica, parâmetros, etc. Um modelo de regressão envolve aplicar os dados observados e encontrar b0 e b1 no modelo apresentado, gerando assim uma equação que pode ser usada para prever o volume de outras árvores.
+
+##### Dado o arquivo **Volumes.csv**, que contém os dados de observação, escolha um modelo de aprendizado de máquina com a melhor estimativa, a partir da estatística de correlação.
+
+> #### **Tarefas:**
+> #### 1. Carregar o arquivo **Volumes.csv**
+
+```{r,echo=TRUE}
+    df_vol <-read.csv("Volumes.csv",sep=";",dec=",")
+  ```
+> #### 2. Eliminar a coluna NR, que só apresenta um número sequencial
+
+```{r,echo=TRUE}
+    df_vol$NR <- NULL
+```
+> #### 3. Criar partição de dados: treinamento 80%, teste 20%
+
+```{r,echo=TRUE}
+    indices <- createDataPartition(df_vol$VOL, p=0.80,
+                               list=FALSE)
+    treino <- df_vol[indices,]
+    teste <- df_vol[-indices,]
+```
+  
