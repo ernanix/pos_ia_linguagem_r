@@ -12,11 +12,13 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r,echo=FALSE}
-  setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
+  #setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
+  setwd("D:/Cursos/Pos_IA/linguagem_r/atividade")
 ```
 
 
 #### **TRABALHO DA DISCIPLINA - LINGUAGEM R**
+#### **Aluno:**Ernani de Souza Cubas Neto 
 
 ***
 
@@ -48,7 +50,7 @@ knitr::opts_chunk$set(echo = FALSE)
   treino <- dados_satelite[indices,]
   teste <- dados_satelite[-indices,]
 ```
-
+***
 > #### **Tarefas:**
 > #### 1. Treine modelos RandomForest, SVM e RNA para predição destes dados.
 
@@ -58,6 +60,7 @@ knitr::opts_chunk$set(echo = FALSE)
   rna <- caret::train(classes~x.17+x.18+x.19+x.20, data=treino, method="nnet",trace=FALSE)
   
 ```
+***
 > #### 2. Escolha o melhor modelo com base em suas matrizes de confusão.
 > #### 2.1. Aplicar modelos treinados na base de Teste
 
@@ -74,6 +77,7 @@ knitr::opts_chunk$set(echo = FALSE)
   confusionMatrix(predict.rna, teste$classes)
 ```
 > ##### **Conclusão:** O modelo SVM apresentou uma maior acurácia, de 0.8629. Será então o modelo escolhido
+***
 > #### 3. Treine o modelo final com todos os dados e faça a predição na base completa.
 > #### 3.1. Verificando o valor de sigma e C
 
@@ -89,7 +93,9 @@ knitr::opts_chunk$set(echo = FALSE)
   final_predict.svm <- predict(final_model, dados_satelite)
   confusionMatrix(final_predict.svm, dados_satelite$classes)
 ```
+***
 > #### 4. Analise o resultado.
+***
 > #### 5. Salve este modelo final
 
 ```{r,echo=TRUE}
@@ -119,12 +125,14 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r,echo=TRUE}
     df_vol <-read.csv("Volumes.csv",sep=";",dec=",")
-  ```
+```
+***
 > #### 2. Eliminar a coluna NR, que só apresenta um número sequencial
 
 ```{r,echo=TRUE}
     df_vol$NR <- NULL
 ```
+***
 > #### 3. Criar partição de dados: treinamento 80%, teste 20%
 
 ```{r,echo=TRUE}
@@ -133,4 +141,41 @@ knitr::opts_chunk$set(echo = FALSE)
     treino <- df_vol[indices,]
     teste <- df_vol[-indices,]
 ```
+***
+> #### 4. Usando o pacote "caret", treinar os modelos: Random Forest (rf), SVM (svmRadial), Redes Neurais (neuralnet) e o modelo alométrico de SPURR
+> #### 5. O modelo alométrico é dado por: Volume = b0 + b1 * dap2 * Ht
+
+```{r,echo=TRUE}
+  rf <- train(VOL~., data=treino, method="rf")
+  svm <- train(VOL~., data=treino, method="svmRadial")
+  rna <- train(VOL~., data=treino, method="nnet",trace=FALSE)
+  alom <- nls(VOL ~ b0 + b1*DAP*DAP*HT, treino, start=list(b0=0.5,b1=0.5))
+```
+***
+> #### 6.Efetue as predições nos dados de teste
+
+```{r,echo=TRUE}
+  predict.rf <- predict(rf, teste)
+  predict.svm <- predict(svm, teste)
+  predict.rna <- predict(rna, teste)
+  predict.alom <- predict(alom, teste)
+```
+
+```{r,echo=TRUE}
+  coef_determinacao <- function(val_obs,val_pred,med_obs){
+     sum1 <- sum((val_obs - val_pred) ^ 2)
+     sum2 <- sum((val_obs - med_obs) ^ 2)
+     return (1-(sum1 / sum2))
+  }
+
+  erro_padrao <- function(val_obs,val_pred) {
+     sum1 <- sum((val_obs - val_pred) ^ 2)
+     count <- length(teste$VOL)
+     return (sqrt(sum1 / (count-2)))
+  }
   
+  erro_padrao_porc <- function(val_obs,val_pred,med_obs) {
+     erro_padrao <- erro_padrao(val_obs,val_pred)
+     return ((erro_padrao / med_obs) * 100)
+  }
+```

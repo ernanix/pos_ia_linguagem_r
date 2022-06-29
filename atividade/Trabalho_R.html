@@ -11,7 +11,7 @@
 
 
 
-<title>Trabalho_r.knit</title>
+<title>Trabalho_R.knit</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -421,11 +421,14 @@ uma vizinhança 3x3 atravessa um limite.</h5>
 completo (não possui dados faltantes)</h5>
 <blockquote>
 <h4 id="carregando-a-base"><strong>Carregando a base:</strong></h4>
+</blockquote>
 <pre class="r"><code>  library(&quot;mlbench&quot;)
   data(Satellite)
   dados_satelite &lt;- Satellite</code></pre>
+<blockquote>
 <h4 id="particionando-a-base"><strong>Particionando a
 base:</strong></h4>
+</blockquote>
 <pre class="r"><code>  library(caret)</code></pre>
 <pre><code>## Carregando pacotes exigidos: ggplot2</code></pre>
 <pre><code>## Carregando pacotes exigidos: lattice</code></pre>
@@ -433,23 +436,29 @@ base:</strong></h4>
   indices &lt;- createDataPartition(dados_satelite$classes, p=0.80, list=FALSE)
   treino &lt;- dados_satelite[indices,]
   teste &lt;- dados_satelite[-indices,]</code></pre>
-</blockquote>
+<hr />
 <blockquote>
 <h4 id="tarefas"><strong>Tarefas:</strong></h4>
 <h4 id="treine-modelos-randomforest-svm-e-rna-para-predição-destes-dados.">1.
 Treine modelos RandomForest, SVM e RNA para predição destes dados.</h4>
-<pre class="r"><code>  rf &lt;- train(classes~x.17+x.18+x.19+x.20, data=treino, method=&quot;rf&quot;)
-  svm &lt;- train(classes~x.17+x.18+x.19+x.20, data=treino, method=&quot;svmRadial&quot;)
-  rna &lt;- train(classes~x.17+x.18+x.19+x.20, data=treino, method=&quot;nnet&quot;,trace=FALSE)</code></pre>
+</blockquote>
+<pre class="r"><code>  rf &lt;- caret::train(classes~x.17+x.18+x.19+x.20, data=treino, method=&quot;rf&quot;)
+  svm &lt;- caret::train(classes~x.17+x.18+x.19+x.20, data=treino, method=&quot;svmRadial&quot;)
+  rna &lt;- caret::train(classes~x.17+x.18+x.19+x.20, data=treino, method=&quot;nnet&quot;,trace=FALSE)</code></pre>
+<hr />
+<blockquote>
 <h4 id="escolha-o-melhor-modelo-com-base-em-suas-matrizes-de-confusão.">2.
 Escolha o melhor modelo com base em suas matrizes de confusão.</h4>
 <h4 id="aplicar-modelos-treinados-na-base-de-teste">2.1. Aplicar modelos
 treinados na base de Teste</h4>
+</blockquote>
 <pre class="r"><code>  predict.rf &lt;- predict(rf, teste)
   predict.svm &lt;- predict(svm, teste)
   predict.rna &lt;- predict(rna, teste)</code></pre>
+<blockquote>
 <h4 id="criar-as-matrizes-de-confusão-e-comparar-os-resultados">2.2.
 Criar as matrizes de confusão e comparar os resultados</h4>
+</blockquote>
 <pre class="r"><code>  confusionMatrix(predict.rf, teste$classes)</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
@@ -630,14 +639,17 @@ Criar as matrizes de confusão e comparar os resultados</h4>
 ## Detection Rate                           0.2072
 ## Detection Prevalence                     0.2726
 ## Balanced Accuracy                        0.8991</code></pre>
+<blockquote>
 <h5 id="conclusão-o-modelo-svm-apresentou-uma-maior-acurácia-de-0.8629.-será-então-o-modelo-escolhido"><strong>Conclusão:</strong>
 O modelo SVM apresentou uma maior acurácia, de 0.8629. Será então o
 modelo escolhido</h5>
+<hr />
 <h4 id="treine-o-modelo-final-com-todos-os-dados-e-faça-a-predição-na-base-completa.">3.
 Treine o modelo final com todos os dados e faça a predição na base
 completa.</h4>
 <h4 id="verificando-o-valor-de-sigma-e-c">3.1. Verificando o valor de
 sigma e C</h4>
+</blockquote>
 <pre class="r"><code>  print(svm)</code></pre>
 <pre><code>## Support Vector Machines with Radial Basis Function Kernel 
 ## 
@@ -658,8 +670,10 @@ sigma e C</h4>
 ## Tuning parameter &#39;sigma&#39; was held constant at a value of 1.033562
 ## Accuracy was used to select the optimal model using the largest value.
 ## The final values used for the model were sigma = 1.033562 and C = 1.</code></pre>
+<blockquote>
 <h4 id="treinando-o-modelo-final-com-os-dados-encontrados">3.2.
 Treinando o modelo final com os dados encontrados</h4>
+</blockquote>
 <pre class="r"><code>  library(kernlab)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;kernlab&#39;</code></pre>
@@ -729,10 +743,76 @@ Treinando o modelo final com os dados encontrados</h4>
 ## Detection Rate                           0.1963
 ## Detection Prevalence                     0.2317
 ## Balanced Accuracy                        0.8956</code></pre>
+<hr />
+<blockquote>
 <h4 id="analise-o-resultado.">4. Analise o resultado.</h4>
+<hr />
 <h4 id="salve-este-modelo-final">5. Salve este modelo final</h4>
-<pre class="r"><code>  saveRDS(final_model, &quot;satellite_svm.rds&quot;)</code></pre>
 </blockquote>
+<pre class="r"><code>  saveRDS(final_model, &quot;satellite_svm.rds&quot;)</code></pre>
+<hr />
+</div>
+</div>
+<div id="estimativa-de-volumes-de-árvores" class="section level4">
+<h4><strong>Estimativa de Volumes de Árvores</strong></h4>
+<div id="modelos-de-aprendizado-de-máquina-são-bastante-usados-na-área-da-engenharia-florestal-mensuração-florestal-para-por-exemplo-estimar-o-volume-de-madeira-de-árvores-sem-ser-necessário-abatê-las." class="section level5">
+<h5>Modelos de aprendizado de máquina são bastante usados na área da
+engenharia florestal (mensuração florestal) para, por exemplo, estimar o
+volume de madeira de árvores sem ser necessário abatê-las.</h5>
+</div>
+<div id="o-processo-é-feito-pela-coleta-de-dados-dados-observados-através-do-abate-de-algumas-árvores-onde-sua-altura-diâmetro-na-altura-do-peito-dap-etc-são-medidos-de-forma-exata.-com-estes-dados-treina-se-um-modelo-de-am-que-pode-estimar-o-volume-de-outras-árvores-da-população." class="section level5">
+<h5>O processo é feito pela coleta de dados (dados observados) através
+do abate de algumas árvores, onde sua altura, diâmetro na altura do
+peito (dap), etc, são medidos de forma exata. Com estes dados, treina-se
+um modelo de AM que pode estimar o volume de outras árvores da
+população.</h5>
+</div>
+<div id="as-classes-são-solo-vermelho-colheita-de-algodão-solo-cinza-solo-cinza-úmido-restolho-de-vegetação-solo-cinza-muito-úmido.-1" class="section level5">
+<h5>As classes são: solo vermelho, colheita de algodão, solo cinza, solo
+cinza úmido, restolho de vegetação, solo cinza muito úmido.</h5>
+</div>
+<div id="os-modelos-chamados-alométricos-são-usados-na-área-há-muitos-anos-e-são-baseados-em-regressão-linear-ou-não-para-encontrar-uma-equação-que-descreve-os-dados.-por-exemplo-o-modelo-de-spurr-é-dado-por" class="section level5">
+<h5>Os modelos, chamados <strong>alométricos</strong>, são usados na
+área há muitos anos e são baseados em regressão (linear ou não) para
+encontrar uma equação que descreve os dados. Por exemplo, o modelo de
+Spurr é dado por:</h5>
+<blockquote>
+<h5 id="volume-b0-b1-dap²-ht">Volume = b0 + b1 * dap² * Ht</h5>
+</blockquote>
+</div>
+<div id="onde-dap-é-o-diâmetro-na-altura-do-peito-13metros-ht-é-a-altura-total.-tem-se-vários-modelos-alométricos-cada-um-com-uma-determinada-característica-parâmetros-etc.-um-modelo-de-regressão-envolve-aplicar-os-dados-observados-e-encontrar-b0-e-b1-no-modelo-apresentado-gerando-assim-uma-equação-que-pode-ser-usada-para-prever-o-volume-de-outras-árvores." class="section level5">
+<h5>Onde <strong>dap</strong> é o diâmetro na altura do peito
+(1,3metros), <strong>Ht</strong> é a altura total. Tem-se vários modelos
+alométricos, cada um com uma determinada característica, parâmetros,
+etc. Um modelo de regressão envolve aplicar os dados observados e
+encontrar b0 e b1 no modelo apresentado, gerando assim uma equação que
+pode ser usada para prever o volume de outras árvores.</h5>
+</div>
+<div id="dado-o-arquivo-volumes.csv-que-contém-os-dados-de-observação-escolha-um-modelo-de-aprendizado-de-máquina-com-a-melhor-estimativa-a-partir-da-estatística-de-correlação." class="section level5">
+<h5>Dado o arquivo <strong>Volumes.csv</strong>, que contém os dados de
+observação, escolha um modelo de aprendizado de máquina com a melhor
+estimativa, a partir da estatística de correlação.</h5>
+<blockquote>
+<h4 id="tarefas-1"><strong>Tarefas:</strong></h4>
+<h4 id="carregar-o-arquivo-volumes.csv">1. Carregar o arquivo
+<strong>Volumes.csv</strong></h4>
+</blockquote>
+<pre class="r"><code>    df_vol &lt;-read.csv(&quot;Volumes.csv&quot;,sep=&quot;;&quot;,dec=&quot;,&quot;)</code></pre>
+<hr />
+<blockquote>
+<h4 id="eliminar-a-coluna-nr-que-só-apresenta-um-número-sequencial">2.
+Eliminar a coluna NR, que só apresenta um número sequencial</h4>
+</blockquote>
+<pre class="r"><code>    df_vol$NR &lt;- NULL</code></pre>
+<hr />
+<blockquote>
+<h4 id="criar-partição-de-dados-treinamento-80-teste-20">3. Criar
+partição de dados: treinamento 80%, teste 20%</h4>
+</blockquote>
+<pre class="r"><code>    indices &lt;- createDataPartition(df_vol$VOL, p=0.80,
+                               list=FALSE)
+    treino &lt;- df_vol[indices,]
+    teste &lt;- df_vol[-indices,]</code></pre>
 </div>
 </div>
 
