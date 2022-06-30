@@ -5,15 +5,15 @@
   }
 </style>
 
-![](D:/Cursos/Pos_IA/linguagem_r/atividade/top.jpg)
+![](top.jpg)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r,echo=FALSE}
-  #setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
-  setwd("D:/Cursos/Pos_IA/linguagem_r/atividade")
+  setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
+  #setwd("D:/Cursos/Pos_IA/linguagem_r/atividade")
 ```
 
 
@@ -76,7 +76,6 @@ knitr::opts_chunk$set(echo = FALSE)
   confusionMatrix(predict.svm, teste$classes)
   confusionMatrix(predict.rna, teste$classes)
 ```
-> ##### **Conclusão:** O modelo SVM apresentou uma maior acurácia, de 0.8629. Será então o modelo escolhido
 ***
 > #### 3. Treine o modelo final com todos os dados e faça a predição na base completa.
 > #### 3.1. Verificando o valor de sigma e C
@@ -95,6 +94,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 ***
 > #### 4. Analise o resultado.
+> #### *Dentre os três modelos testados (RandomForest, SVM e RNA), o SVM foi o que apresentou maior acurácia no teste da Matriz de Confusão, com valor de 0,8629.*
+> #### *Para criação do modelo final, foram levantados e usados os valores de Sigma e C, resultando em uma acurácia no teste da Matriz de Confusão usando todos os dados em 0,8693* 
 ***
 > #### 5. Salve este modelo final
 
@@ -160,6 +161,9 @@ knitr::opts_chunk$set(echo = FALSE)
   predict.rna <- predict(rna, teste)
   predict.alom <- predict(alom, teste)
 ```
+***
+> #### 7.Crie funções e calcule as seguintes métricas entre a predição e os dados observados
+> #### 7.1 Coeficiente de Determinação - R²
 
 ```{r,echo=TRUE}
   coef_determinacao <- function(val_obs,val_pred,med_obs){
@@ -167,13 +171,19 @@ knitr::opts_chunk$set(echo = FALSE)
      sum2 <- sum((val_obs - med_obs) ^ 2)
      return (1-(sum1 / sum2))
   }
+```
+> #### 7.2 Erro padrão da estimativa: S~yx~
 
+```{r,echo=TRUE}
   erro_padrao <- function(val_obs,val_pred) {
      sum1 <- sum((val_obs - val_pred) ^ 2)
      count <- length(teste$VOL)
      return (sqrt(sum1 / (count-2)))
   }
-  
+```
+> #### 7.3 S~yx~ %
+
+```{r,echo=TRUE}
   erro_padrao_porc <- function(val_obs,val_pred,med_obs) {
      erro_padrao <- erro_padrao(val_obs,val_pred)
      return ((erro_padrao / med_obs) * 100)
