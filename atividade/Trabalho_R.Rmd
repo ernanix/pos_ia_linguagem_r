@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r,echo=FALSE}
-  setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
-  #setwd("D:/Cursos/Pos_IA/linguagem_r/atividade")
+  #setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
+  setwd("D:/Cursos/Pos_IA/linguagem_r/atividade")
 ```
 
 
@@ -96,6 +96,7 @@ knitr::opts_chunk$set(echo = FALSE)
 > #### 4. Analise o resultado.
 > #### *Dentre os três modelos testados (RandomForest, SVM e RNA), o SVM foi o que apresentou maior acurácia no teste da Matriz de Confusão, com valor de 0,8629.*
 > #### *Para criação do modelo final, foram levantados e usados os valores de Sigma e C, resultando em uma acurácia no teste da Matriz de Confusão usando todos os dados em 0,8693* 
+
 ***
 > #### 5. Salve este modelo final
 
@@ -146,10 +147,10 @@ knitr::opts_chunk$set(echo = FALSE)
 > #### 4. Usando o pacote "caret", treinar os modelos: Random Forest (rf), SVM (svmRadial), Redes Neurais (neuralnet) e o modelo alométrico de SPURR
 > #### 5. O modelo alométrico é dado por: Volume = b0 + b1 * dap2 * Ht
 
-```{r,echo=TRUE}
-  rf <- train(VOL~., data=treino, method="rf")
-  svm <- train(VOL~., data=treino, method="svmRadial")
-  rna <- train(VOL~., data=treino, method="nnet",trace=FALSE)
+```{r,echo=TRUE,warning=FALSE}
+  rf <- caret::train(VOL~., data=treino, method="rf")
+  svm <- caret::train(VOL~., data=treino, method="svmRadial")
+  rna <- caret::train(VOL~., data=treino, method="neuralnet")
   alom <- nls(VOL ~ b0 + b1*DAP*DAP*HT, treino, start=list(b0=0.5,b1=0.5))
 ```
 ***
@@ -189,3 +190,34 @@ knitr::opts_chunk$set(echo = FALSE)
      return ((erro_padrao / med_obs) * 100)
   }
 ```
+
+> #### 7.4 Calculando o R²
+
+```{r,echo=TRUE}
+  print(paste("RandomForest:",coef_determinacao(teste$VOL,predict.rf,mean(teste$VOL))))
+  print(paste("SVM:",coef_determinacao(teste$VOL,predict.svm,mean(teste$VOL))))
+  print(paste("Redes Neurais:",coef_determinacao(teste$VOL,predict.rna,mean(teste$VOL))))
+  print(paste("Modelo Alométrico:",coef_determinacao(teste$VOL,predict.alom,mean(teste$VOL))))
+```
+
+> #### 7.4 Calculando o S~yx~
+
+```{r,echo=TRUE}
+  print(paste("RandomForest:",erro_padrao(teste$VOL,predict.rf)))
+  print(paste("SVM:",erro_padrao(teste$VOL,predict.svm)))
+  print(paste("Redes Neurais:",erro_padrao(teste$VOL,predict.rna)))
+  print(paste("Modelo Alométrico:",erro_padrao(teste$VOL,predict.alom)))
+```
+
+> #### 7.4 Calculando o S~yx~%
+
+```{r,echo=TRUE}
+  print(paste("RandomForest:",erro_padrao_porc(teste$VOL,predict.rf,mean(teste$VOL))))
+  print(paste("SVM:",erro_padrao_porc(teste$VOL,predict.svm,mean(teste$VOL))))
+  print(paste("Redes Neurais:",erro_padrao_porc(teste$VOL,predict.rna,mean(teste$VOL))))
+  print(paste("Modelo Alométrico:",erro_padrao_porc(teste$VOL,predict.alom,mean(teste$VOL))))
+```
+***
+> #### 8. Escolha o melhor modelo
+> #### *No cálculo do Coeficiente de Determinação, o modelo **Alométrico** obteve melhor desempenho, com valor 0.8447, ou seja, mais próximo de 1*
+> #### *Pelo cálculo do erro padrão da estimativa e sua porcentagem, os valores reafirmam que o modelo **Alométrico** é o que realmente possui melhores resultados, apresentando a menor porcentagem de erro, de 12.25% * 

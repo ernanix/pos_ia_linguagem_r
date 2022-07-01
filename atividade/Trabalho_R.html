@@ -11,7 +11,7 @@
 
 
 
-<title>Trabalho_R.knit</title>
+<title>Trabalho_r.knit</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -754,7 +754,9 @@ apresentou maior acurácia no teste da Matriz de Confusão, com valor de
 criação do modelo final, foram levantados e usados os valores de Sigma e
 C, resultando em uma acurácia no teste da Matriz de Confusão usando
 todos os dados em 0,8693</em></h4>
+</blockquote>
 <hr />
+<blockquote>
 <h4 id="salve-este-modelo-final">5. Salve este modelo final</h4>
 </blockquote>
 <pre class="r"><code>  saveRDS(final_model, &quot;satellite_svm.rds&quot;)</code></pre>
@@ -830,13 +832,11 @@ SPURR</h4>
 <h4 id="o-modelo-alométrico-é-dado-por-volume-b0-b1-dap2-ht">5. O modelo
 alométrico é dado por: Volume = b0 + b1 * dap2 * Ht</h4>
 </blockquote>
-<pre class="r"><code>  rf &lt;- train(VOL~., data=treino, method=&quot;rf&quot;)</code></pre>
+<pre class="r"><code>  rf &lt;- caret::train(VOL~., data=treino, method=&quot;rf&quot;)</code></pre>
 <pre><code>## note: only 2 unique complexity parameters in default grid. Truncating the grid to 2 .</code></pre>
-<pre class="r"><code>  svm &lt;- train(VOL~., data=treino, method=&quot;svmRadial&quot;)
-  rna &lt;- train(VOL~., data=treino, method=&quot;nnet&quot;,trace=FALSE)</code></pre>
-<pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info = trainInfo, :
-## There were missing values in resampled performance measures.</code></pre>
-<pre class="r"><code>  alom &lt;- nls(VOL ~ b0 + b1*DAP*DAP*HT, treino, start=list(b0=0.5,b1=0.5))</code></pre>
+<pre class="r"><code>  svm &lt;- caret::train(VOL~., data=treino, method=&quot;svmRadial&quot;)
+  rna &lt;- caret::train(VOL~., data=treino, method=&quot;neuralnet&quot;)
+  alom &lt;- nls(VOL ~ b0 + b1*DAP*DAP*HT, treino, start=list(b0=0.5,b1=0.5))</code></pre>
 <hr />
 <blockquote>
 <h4 id="efetue-as-predições-nos-dados-de-teste">6.Efetue as predições
@@ -875,6 +875,52 @@ S<sub>yx</sub></h4>
      erro_padrao &lt;- erro_padrao(val_obs,val_pred)
      return ((erro_padrao / med_obs) * 100)
   }</code></pre>
+<blockquote>
+<h4 id="calculando-o-r²">7.4 Calculando o R²</h4>
+</blockquote>
+<pre class="r"><code>  print(paste(&quot;RandomForest:&quot;,coef_determinacao(teste$VOL,predict.rf,mean(teste$VOL))))</code></pre>
+<pre><code>## [1] &quot;RandomForest: 0.831847530950144&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;SVM:&quot;,coef_determinacao(teste$VOL,predict.svm,mean(teste$VOL))))</code></pre>
+<pre><code>## [1] &quot;SVM: 0.77838247473513&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;Redes Neurais:&quot;,coef_determinacao(teste$VOL,predict.rna,mean(teste$VOL))))</code></pre>
+<pre><code>## [1] &quot;Redes Neurais: 0.840478437724335&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;Modelo Alométrico:&quot;,coef_determinacao(teste$VOL,predict.alom,mean(teste$VOL))))</code></pre>
+<pre><code>## [1] &quot;Modelo Alométrico: 0.84473560244696&quot;</code></pre>
+<blockquote>
+<h4 id="calculando-o-syx">7.4 Calculando o S<sub>yx</sub></h4>
+</blockquote>
+<pre class="r"><code>  print(paste(&quot;RandomForest:&quot;,erro_padrao(teste$VOL,predict.rf)))</code></pre>
+<pre><code>## [1] &quot;RandomForest: 0.168706546860275&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;SVM:&quot;,erro_padrao(teste$VOL,predict.svm)))</code></pre>
+<pre><code>## [1] &quot;SVM: 0.19367892342655&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;Redes Neurais:&quot;,erro_padrao(teste$VOL,predict.rna)))</code></pre>
+<pre><code>## [1] &quot;Redes Neurais: 0.164319842148403&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;Modelo Alométrico:&quot;,erro_padrao(teste$VOL,predict.alom)))</code></pre>
+<pre><code>## [1] &quot;Modelo Alométrico: 0.16211240665333&quot;</code></pre>
+<blockquote>
+<h4 id="calculando-o-syx-1">7.4 Calculando o S<sub>yx</sub>%</h4>
+</blockquote>
+<pre class="r"><code>  print(paste(&quot;RandomForest:&quot;,erro_padrao_porc(teste$VOL,predict.rf,mean(teste$VOL))))</code></pre>
+<pre><code>## [1] &quot;RandomForest: 12.7547883699761&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;SVM:&quot;,erro_padrao_porc(teste$VOL,predict.svm,mean(teste$VOL))))</code></pre>
+<pre><code>## [1] &quot;SVM: 14.6427849185748&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;Redes Neurais:&quot;,erro_padrao_porc(teste$VOL,predict.rna,mean(teste$VOL))))</code></pre>
+<pre><code>## [1] &quot;Redes Neurais: 12.4231385835109&quot;</code></pre>
+<pre class="r"><code>  print(paste(&quot;Modelo Alométrico:&quot;,erro_padrao_porc(teste$VOL,predict.alom,mean(teste$VOL))))</code></pre>
+<pre><code>## [1] &quot;Modelo Alométrico: 12.2562489570914&quot;</code></pre>
+<hr />
+<blockquote>
+<h4 id="escolha-o-melhor-modelo">8. Escolha o melhor modelo</h4>
+<h4 id="no-cálculo-do-coeficiente-de-determinação-o-modelo-alométrico-obteve-melhor-desempenho-com-valor-0.8447-ou-seja-mais-próximo-de-1"><em>No
+cálculo do Coeficiente de Determinação, o modelo
+<strong>Alométrico</strong> obteve melhor desempenho, com valor 0.8447,
+ou seja, mais próximo de 1</em></h4>
+<h4 id="pelo-cálculo-do-erro-padrão-da-estimativa-e-sua-porcentagem-os-valores-reafirmam-que-o-modelo-alométrico-é-o-que-realmente-possui-melhores-resultados-apresentando-a-menor-porcentagem-de-erro-de-12.25"><em>Pelo
+cálculo do erro padrão da estimativa e sua porcentagem, os valores
+reafirmam que o modelo <strong>Alométrico</strong> é o que realmente
+possui melhores resultados, apresentando a menor porcentagem de erro, de
+12.25% </em></h4>
+</blockquote>
 </div>
 </div>
 
