@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r,echo=FALSE}
-  setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
-  #setwd("D:/Cursos/Pos_IA/linguagem_r/atividade")
+  #setwd("C:/Users/escneto/Documents/Estudos/Pos_IA_UFPR/Linguagem_Programacao_R/atividade")
+  setwd("D:/Cursos/Pos_IA/linguagem_r/atividade")
 ```
 
 
