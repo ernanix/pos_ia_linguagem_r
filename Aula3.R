@@ -1,6 +1,6 @@
 #Slide 13 - Página 25
 #Gere os gráficos em arquivos PDF e PNG
-setwd("D:\\Cursos\\Pos_IA\\linguagem_r")
+setwd("/Users/MPPR/Documents/Pos_IA/pos_ia_linguagem_r")
 png(file="teste.png")
 ggplot(data.frame(x=c(0,25)),aes(x=x)) + stat_function(fun=func,geom="line")
 dev.off()
